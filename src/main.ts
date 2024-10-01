@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import * as cookieParser from "cookie-parser"
+import * as cookieParser from "cookie-parser";
 // import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function start() {
@@ -23,7 +23,6 @@ async function start() {
     await app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
       console.log("helloo");
-      
     });
   } catch (error) {
     console.log(error);
