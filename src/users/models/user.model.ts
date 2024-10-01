@@ -77,4 +77,9 @@ export class User extends Model<User, IUserCreationAttr> {
     type: DataType.STRING,
   })
   hashed_refresh_token: string;
+
+  @Column({
+    type: DataType.STRING
+  })
+  activation_link: string;
 }
