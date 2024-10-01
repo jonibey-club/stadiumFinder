@@ -16,6 +16,8 @@ import { User } from "./users/models/user.model";
 import { MailModule } from './mail/mail.module';
 import { UserCardModule } from './user_card/user_card.module';
 import { UserCard } from "./user_card/models/user_card.model";
+import { UserWalletModule } from './user_wallet/user_wallet.module';
+import { UserWallet } from "./user_wallet/models/user_wallet.model";
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { UserCard } from "./user_card/models/user_card.model";
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [Comfort, Region, Categories, District,User,UserCard],
+      models: [Comfort, Region, Categories, District,User,UserCard,UserWallet],
       autoLoadModels: true,
       sync: { alter: true },
       // logging: true
@@ -42,6 +44,7 @@ import { UserCard } from "./user_card/models/user_card.model";
     UsersModule,
     MailModule,
     UserCardModule,
+    UserWalletModule,
   ],
   controllers: [],
   providers: [],

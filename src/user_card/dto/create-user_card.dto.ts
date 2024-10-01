@@ -1,5 +1,5 @@
 export class CreateUserCardDto {
-  user_id: number;
+  userId: number;
   name: string;
   phone: string;
   number: number;

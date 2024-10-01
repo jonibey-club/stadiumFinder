@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { UserCard } from "../../user_card/models/user_card.model";
+import { UserWallet } from "../../user_wallet/models/user_wallet.model";
 
 interface IUserCreationAttr{
   full_name: string;
@@ -82,4 +84,10 @@ export class User extends Model<User, IUserCreationAttr> {
     type: DataType.STRING
   })
   activation_link: string;
+
+  @HasMany(()=> UserCard)
+  userCards: UserCard[];
+
+  @HasMany(()=> UserWallet)
+  userWallets: UserWallet[];
 }

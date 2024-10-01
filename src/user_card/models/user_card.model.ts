@@ -2,7 +2,7 @@ import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize
 import { User } from "../../users/models/user.model";
 
 interface IUserCardCreationAttr {
-  user_id: number;
+  userId: number;
   name: string;
   phone: string;
   number: number;
@@ -19,7 +19,7 @@ export class UserCard extends Model<UserCard, IUserCardCreationAttr> {
 
   @ForeignKey(()=> User)
   @Column({ type: DataType.INTEGER })
-  user_id: number;
+  userId: number;
 
   @Column({ type: DataType.STRING })
   name: string;
