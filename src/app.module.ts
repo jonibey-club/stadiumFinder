@@ -14,6 +14,8 @@ import { Module } from "@nestjs/common";
 import { UsersModule } from './users/users.module';
 import { User } from "./users/models/user.model";
 import { MailModule } from './mail/mail.module';
+import { UserCardModule } from './user_card/user_card.module';
+import { UserCard } from "./user_card/models/user_card.model";
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { MailModule } from './mail/mail.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [Comfort, Region, Categories, District,User],
+      models: [Comfort, Region, Categories, District,User,UserCard],
       autoLoadModels: true,
       sync: { alter: true },
       // logging: true
@@ -39,6 +41,7 @@ import { MailModule } from './mail/mail.module';
     DistrictModule,
     UsersModule,
     MailModule,
+    UserCardModule,
   ],
   controllers: [],
   providers: [],
