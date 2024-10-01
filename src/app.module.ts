@@ -13,6 +13,7 @@ import { Categories } from "./categories/models/categories.model";
 import { Module } from "@nestjs/common";
 import { UsersModule } from './users/users.module';
 import { User } from "./users/models/user.model";
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { User } from "./users/models/user.model";
     RegionModule,
     DistrictModule,
     UsersModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],

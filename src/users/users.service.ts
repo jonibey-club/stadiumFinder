@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/sequelize";
@@ -7,12 +7,14 @@ import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import * as uuid from "uuid";
 import { Response } from "express";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async generateTokens(user: User) {
@@ -68,6 +70,14 @@ export class UsersService {
       httpOnly: true,
       maxAge: +process.env.REFRESH_TIME_MS,
     });
+
+    try {
+      await this.mailService.sendMail(updatedUser[1][0])
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException("Error sending mail");
+    }
+
 
     const response = {
       message: "User registered successfully",
