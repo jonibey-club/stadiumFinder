@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   Res,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { Response } from "express";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { SignInUserDto } from "./dto/sign-in.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -27,22 +30,32 @@ export class UsersController {
     return this.usersService.signUp(createUserDto, res);
   }
 
-  @Get("all")
+  @ApiOperation({ summary: "Tizimga kirish" })
+  @HttpCode(HttpStatus.OK)
+  @Post("signin")
+  signIn(@Body() signInUserDto: SignInUserDto) {
+    return this.usersService.signIn(
+      signInUserDto.email,
+      signInUserDto.password
+    );
+  }
+
+  @Get("get")
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get(":id")
+  @Get("get/:id")
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(":id")
+  @Patch("update/:id")
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(":id")
+  @Delete("delete/:id")
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }

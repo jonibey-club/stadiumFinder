@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
+    private readonly mailService: MailService
   ) {}
 
   async generateTokens(user: User) {
@@ -72,12 +72,11 @@ export class UsersService {
     });
 
     try {
-      await this.mailService.sendMail(updatedUser[1][0])
+      await this.mailService.sendMail(updatedUser[1][0]);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new InternalServerErrorException("Error sending mail");
     }
-
 
     const response = {
       message: "User registered successfully",
@@ -87,6 +86,23 @@ export class UsersService {
     return response;
   }
 
+  async signIn(email: string, password: string) {
+    const user = await this.userModel.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException("User not found");
+    }
+    const isMatch = await bcrypt.compare(password, user.hashed_password);
+
+    if (!isMatch) {
+      throw new BadRequestException("Invalid password");
+    }
+
+    const tokens = await this.generateTokens(user);
+    return {
+      user,
+      access_token: tokens.access_token,
+    };
+  }
 
   findAll() {
     return this.userModel.findAll({ include: { all: true } });
