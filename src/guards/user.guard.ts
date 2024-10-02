@@ -1,8 +1,8 @@
-import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
 
-
+@Injectable()
 export class UserGuard implements CanActivate{
   constructor(private readonly jwtService: JwtService){}
   

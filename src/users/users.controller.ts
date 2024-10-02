@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Req,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -18,6 +19,7 @@ import { Response } from "express";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SignInUserDto } from "./dto/sign-in.dto";
 import { UserGuard } from "../guards/user.guard";
+import { CookieGetter } from "../decorators/cookie_getter.decorator";
 
 @ApiTags("Users")
 @Controller("users")
@@ -32,7 +34,7 @@ export class UsersController {
     return this.usersService.signUp(createUserDto, res);
   }
 
-  @Patch("activate/:link")
+  @Get("activate/:link")
   async activateUser(@Param("link") link: string) {
     return this.usersService.activateUser(link);
   }
@@ -45,6 +47,14 @@ export class UsersController {
       signInUserDto.email,
       signInUserDto.password
     );
+  }
+
+  @Post("refreshtoken")
+  async refreshToken(
+    @Res({ passthrough: true }) res: Response,
+    @CookieGetter("refresh_token") refresh_token: string
+  ) {
+    return this.usersService.refreshTokens(refresh_token, res);
   }
 
   @UseGuards(UserGuard)

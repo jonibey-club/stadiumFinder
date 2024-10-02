@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/sequelize";
@@ -108,7 +114,7 @@ export class UsersService {
     link: string
   ): Promise<{ is_active: boolean; message: string }> {
     const user = await this.userModel.findOne({
-      where: { activation_link: link,is_active: false },
+      where: { activation_link: link, is_active: false },
     });
 
     if (!user) {
@@ -145,5 +151,45 @@ export class UsersService {
 
   remove(id: number) {
     return this.userModel.destroy({ where: { id } });
+  }
+
+  async refreshTokens(refresh_token: string, res: Response) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refresh_token, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      const user = await this.userModel.findOne({ where: { id: payload.id } });
+      if (!user) {
+        throw new UnauthorizedException("User not found");
+      }
+
+      const valid_refresh_token = await bcrypt.compare(
+        refresh_token,
+        user.hashed_refresh_token
+      );
+      if (!valid_refresh_token) {
+        throw new UnauthorizedException("Unauthorized user");
+      }
+
+      const tokens = await this.generateTokens(user);
+      const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
+
+      await this.userModel.update(
+        { hashed_refresh_token },
+        { where: { id: user.id } }
+      );
+
+      res.cookie("refresh_token", tokens.refresh_token, {
+        httpOnly: true,
+        maxAge: +process.env.REFRESH_TIME_MS,
+      });
+
+      return {
+        access_token: tokens.access_token,
+      };
+    } catch (error) {
+      throw new BadRequestException("Expired token");
+    }
   }
 }
