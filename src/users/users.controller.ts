@@ -49,6 +49,14 @@ export class UsersController {
     );
   }
 
+  @Post("signout")
+  async signOut(
+    @CookieGetter("refresh_token") refreshToken: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.usersService.signOut(refreshToken, res);
+  }
+
   @Post("refreshtoken")
   async refreshToken(
     @Res({ passthrough: true }) res: Response,

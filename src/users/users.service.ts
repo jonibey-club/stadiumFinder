@@ -110,6 +110,30 @@ export class UsersService {
     };
   }
 
+  async signOut(refreshToken: string, res: Response) {
+    const payload = await this.jwtService.verifyAsync(refreshToken, {
+      secret: process.env.REFRESH_TOKEN_KEY,
+    });
+
+    const user = await this.userModel.findOne({ where: { id: payload.id } });
+    if (!user) {
+      throw new BadRequestException("User not found");
+    }
+
+    await this.userModel.update(
+      { hashed_refresh_token: null },
+      { where: { id: user.id } }
+    );
+
+    res.clearCookie("refresh_token");
+
+    return {
+      message: "User successfully logouted",
+    };
+  }
+
+
+
   async activateUser(
     link: string
   ): Promise<{ is_active: boolean; message: string }> {
