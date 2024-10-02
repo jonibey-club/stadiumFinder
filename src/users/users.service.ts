@@ -1,9 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -11,8 +9,6 @@ import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./models/user.model";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import * as uuid from "uuid";
-import { Response } from "express";
 import { MailService } from "../mail/mail.service";
 
 @Injectable()
@@ -43,95 +39,20 @@ export class UsersService {
     return { access_token, refresh_token };
   }
 
-  async signUp(createUserDto: CreateUserDto, res: Response) {
-    const user = await this.userModel.findOne({
-      where: { email: createUserDto.email },
+  findUserByEmail(email: string) {
+    return this.userModel.findOne({
+      where: { email }
     });
-    if (user) {
-      throw new BadRequestException("User already exists");
-    }
+  }
 
-    if (createUserDto.password !== createUserDto.confirm_password) {
-      throw new BadRequestException("Passwords do not match");
-    }
-
-    const hashed_password = await bcrypt.hash(createUserDto.password, 4);
-
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 3);
     const newUser = await this.userModel.create({
       ...createUserDto,
-      hashed_password,
+      hashed_password: hashedPassword,
     });
-
-    const tokens = await this.generateTokens(newUser);
-    const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 5);
-    const activation_link = uuid.v4();
-    const updatedUser = await this.userModel.update(
-      {
-        hashed_refresh_token,
-        activation_link,
-      },
-      { where: { id: newUser.id }, returning: true }
-    );
-    res.cookie("refresh_token", tokens.refresh_token, {
-      httpOnly: true,
-      maxAge: +process.env.REFRESH_TIME_MS,
-    });
-
-    try {
-      await this.mailService.sendMail(updatedUser[1][0]);
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException("Error sending mail");
-    }
-
-    const response = {
-      message: "User registered successfully",
-      user: updatedUser[1][0],
-      access_token: tokens.access_token,
-    };
-    return response;
+    return newUser;
   }
-
-  async signIn(email: string, password: string) {
-    const user = await this.userModel.findOne({ where: { email } });
-    if (!user) {
-      throw new BadRequestException("User not found");
-    }
-    const isMatch = await bcrypt.compare(password, user.hashed_password);
-
-    if (!isMatch) {
-      throw new BadRequestException("Invalid password");
-    }
-
-    const tokens = await this.generateTokens(user);
-    return {
-      user,
-      access_token: tokens.access_token,
-    };
-  }
-
-  async signOut(refreshToken: string, res: Response) {
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: process.env.REFRESH_TOKEN_KEY,
-    });
-
-    const user = await this.userModel.findOne({ where: { id: payload.id } });
-    if (!user) {
-      throw new BadRequestException("User not found");
-    }
-
-    await this.userModel.update(
-      { hashed_refresh_token: null },
-      { where: { id: user.id } }
-    );
-
-    res.clearCookie("refresh_token");
-
-    return {
-      message: "User successfully logouted",
-    };
-  }
-
 
 
   async activateUser(
@@ -163,7 +84,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.userModel.findOne({ include: { all: true } });
+    return this.userModel.findOne({where: {id},include: { all: true } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -177,43 +98,5 @@ export class UsersService {
     return this.userModel.destroy({ where: { id } });
   }
 
-  async refreshTokens(refresh_token: string, res: Response) {
-    try {
-      const payload = await this.jwtService.verifyAsync(refresh_token, {
-        secret: process.env.REFRESH_TOKEN_KEY,
-      });
-
-      const user = await this.userModel.findOne({ where: { id: payload.id } });
-      if (!user) {
-        throw new UnauthorizedException("User not found");
-      }
-
-      const valid_refresh_token = await bcrypt.compare(
-        refresh_token,
-        user.hashed_refresh_token
-      );
-      if (!valid_refresh_token) {
-        throw new UnauthorizedException("Unauthorized user");
-      }
-
-      const tokens = await this.generateTokens(user);
-      const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
-
-      await this.userModel.update(
-        { hashed_refresh_token },
-        { where: { id: user.id } }
-      );
-
-      res.cookie("refresh_token", tokens.refresh_token, {
-        httpOnly: true,
-        maxAge: +process.env.REFRESH_TIME_MS,
-      });
-
-      return {
-        access_token: tokens.access_token,
-      };
-    } catch (error) {
-      throw new BadRequestException("Expired token");
-    }
-  }
+  
 }
