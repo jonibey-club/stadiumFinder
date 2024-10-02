@@ -107,12 +107,12 @@ export class AuthService {
       secret: process.env.REFRESH_TOKEN_KEY,
     });
 
-    const admin = await this.userService.findOne(payload.id);
+    const admin = await this.adminService.findOne(payload.id);
     if (!admin) {
       throw new BadRequestException("admin not found");
     }
 
-    await this.userService.update(admin.id, { hashed_refresh_token: null });
+    await this.adminService.update(admin.id, { hashed_refresh_token: null });
 
     res.clearCookie("refresh_token");
 
