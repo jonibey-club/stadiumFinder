@@ -9,6 +9,7 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -16,6 +17,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { Response } from "express";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SignInUserDto } from "./dto/sign-in.dto";
+import { UserGuard } from "../guards/user.guard";
 
 @ApiTags("Users")
 @Controller("users")
@@ -30,6 +32,11 @@ export class UsersController {
     return this.usersService.signUp(createUserDto, res);
   }
 
+  @Patch("activate/:link")
+  async activateUser(@Param("link") link: string) {
+    return this.usersService.activateUser(link);
+  }
+
   @ApiOperation({ summary: "Tizimga kirish" })
   @HttpCode(HttpStatus.OK)
   @Post("signin")
@@ -40,6 +47,7 @@ export class UsersController {
     );
   }
 
+  @UseGuards(UserGuard)
   @Get("get")
   findAll() {
     return this.usersService.findAll();
@@ -59,6 +67,4 @@ export class UsersController {
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }
-
-  
 }

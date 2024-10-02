@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/sequelize";
@@ -101,6 +101,30 @@ export class UsersService {
     return {
       user,
       access_token: tokens.access_token,
+    };
+  }
+
+  async activateUser(
+    link: string
+  ): Promise<{ is_active: boolean; message: string }> {
+    const user = await this.userModel.findOne({
+      where: { activation_link: link,is_active: false },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.is_active) {
+      throw new BadRequestException("User already activated");
+    }
+
+    user.is_active = true;
+    await user.save();
+
+    return {
+      is_active: user.is_active,
+      message: "User activated successfully",
     };
   }
 

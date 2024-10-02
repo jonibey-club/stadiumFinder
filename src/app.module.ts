@@ -18,9 +18,20 @@ import { UserCardModule } from './user_card/user_card.module';
 import { UserCard } from "./user_card/models/user_card.model";
 import { UserWalletModule } from './user_wallet/user_wallet.module';
 import { UserWallet } from "./user_wallet/models/user_wallet.model";
+import { BotModule } from './bot/bot.module';
+import { TelegrafModule } from "nestjs-telegraf";
+import { BOT_NAME } from "./app.constants";
 
 @Module({
   imports: [
+    TelegrafModule.forRootAsync({
+      botName: BOT_NAME,
+      useFactory:()=> ({
+        token: process.env.BOT_TOKEN,
+        include: [BotModule],
+        middlewares: [],
+      })
+    }),
     ConfigModule.forRoot({ envFilePath: ".env", isGlobal: true }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "static"),
@@ -45,6 +56,7 @@ import { UserWallet } from "./user_wallet/models/user_wallet.model";
     MailModule,
     UserCardModule,
     UserWalletModule,
+    BotModule,
   ],
   controllers: [],
   providers: [],
