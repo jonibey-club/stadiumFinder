@@ -19,7 +19,7 @@ export class AdminService {
     return newAdmin;
   }
 
-  findAdminByEmail(login: string) {
+  findAdminByEmail(login: string):Promise<Admin> {
     return this.adminModel.findOne({
       where: { login },
       include: {
@@ -28,6 +28,7 @@ export class AdminService {
         through: { attributes: [] },
       },
     });
+    // console.log(admin)
   }
 
   findAll() {

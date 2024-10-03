@@ -19,6 +19,7 @@ import { UsersService } from "../users/users.service";
 import { SignInUserDto } from "./dto/signIn.dto";
 import { UpdateUserDto } from "../users/dto/update-user.dto";
 import { UpdateAdminDto } from "../admin/dto/update-admin.dto";
+import { log } from "console";
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
   ) {}
 
   async signUp_admin(createAdminDto: CreateAdminDto, res: Response) {
+    
     const candidate = await this.adminService.findAdminByEmail(
       createAdminDto.login
     );
@@ -58,7 +60,7 @@ export class AuthService {
 
     const response = {
       message: "Admin registered successfully",
-      admin: updatedAdmin[1][0],
+      admin: updatedAdmin,
       access_token: tokens.access_token,
     };
     return response;
@@ -88,8 +90,9 @@ export class AuthService {
   async signIn_admin(signInDto: SignInAdminDto) {
     const admin = await this.adminService.findAdminByEmail(signInDto.login);
     if (!admin) {
-      throw new UnauthorizedException("Admin not found");
+      throw new UnauthorizedException("Admin 1not found");
     }
+    console.log(signInDto.hashed_password)
 
     const validPassword = await bcrypt.compare(
       signInDto.hashed_password,
@@ -97,7 +100,7 @@ export class AuthService {
     );
 
     if (!validPassword) {
-      throw new UnauthorizedException("Admin not found");
+      throw new UnauthorizedException("Admin 2not found");
     }
     return this.generateTokenAdmin(admin);
   }

@@ -23,6 +23,9 @@ import { TelegrafModule } from "nestjs-telegraf";
 import { BOT_NAME } from "./app.constants";
 import { AdminModule } from "./admin/admin.module";
 import { Admin } from "./admin/models/admin.model";
+import { Bot } from "./bot/models/bot.model";
+import { Address } from "./bot/models/address.model";
+import { Cars } from "./bot/models/cars.model";
 
 @Module({
   imports: [
@@ -53,11 +56,14 @@ import { Admin } from "./admin/models/admin.model";
         User,
         UserCard,
         UserWallet,
-        Admin
+        Admin,
+        Bot,
+        Address,
+        Cars
       ],
       autoLoadModels: true,
       sync: { alter: true },
-      // logging: true
+      logging: false
     }),
     ComfortModule,
     CategoriesModule,
