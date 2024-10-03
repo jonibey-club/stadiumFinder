@@ -34,14 +34,29 @@ export class BotUpdate {
     await this.botService.onAddress(ctx);
   }
 
+  @Command("car")
+  async onCars(@Ctx() ctx: Context) {
+    await this.botService.onCars(ctx);
+  }
+
   @Hears("Yangi manzil qo'shish")
   async addNewAddress(@Ctx() ctx: Context) {
     await this.botService.addNewAddress(ctx);
   }
 
+  @Hears("Yangi mashina qo'shish")
+  async addNewCar(@Ctx() ctx: Context) {
+    await this.botService.addNewCar(ctx);
+  }
+
   @Hears("Mening manzillarim")
   async showAddresses(@Ctx() ctx: Context) {
     await this.botService.showAdresses(ctx);
+  }
+
+  @Hears("Mening mashinalarim")
+  async showCars(@Ctx() ctx: Context) {
+    await this.botService.showCars(ctx);
   }
 
   @On("location")
@@ -52,8 +67,8 @@ export class BotUpdate {
   @Action(/location_+[1-9]/)
   async onClickLocation(@Ctx() ctx: Context) {
     await this.botService.onClickLocation(ctx);
-
   }
+
 
   @On("text")
   async onText(@Ctx() ctx: Context) {

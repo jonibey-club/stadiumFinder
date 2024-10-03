@@ -7,12 +7,14 @@ import { InjectBot } from "nestjs-telegraf";
 import { BOT_NAME } from "../app.constants";
 import { Context, Markup, Telegraf } from "telegraf";
 import { Address } from "./models/address.model";
+import { Cars } from "./models/cars.model";
 
 @Injectable()
 export class BotService {
   constructor(
     @InjectModel(Bot) private botModel: typeof Bot,
     @InjectModel(Address) private addressModel: typeof Address,
+    @InjectModel(Cars) private carsModel: typeof Cars,
     @InjectBot(BOT_NAME) private bot: Telegraf<Context>
   ) {}
 
@@ -133,6 +135,15 @@ export class BotService {
     });
   }
 
+  async onCars(ctx: Context) {
+    await ctx.reply(`Mashinalarim:`, {
+      parse_mode: "HTML",
+      ...Markup.keyboard([
+        ["Mening mashinalarim", "Yangi mashina qo'shish"],
+      ]).resize(),
+    });
+  }
+
   async addNewAddress(ctx: Context) {
     const userId = ctx.from.id;
     const user = await this.botModel.findByPk(userId);
@@ -156,6 +167,29 @@ export class BotService {
     }
   }
 
+  async addNewCar(ctx: Context) {
+    const userId = ctx.from.id;
+    const user = await this.botModel.findByPk(userId);
+    if (!user) {
+      await ctx.reply(`Siz avval ro'yxatdan o'tmagansiz`, {
+        parse_mode: "HTML",
+        ...Markup.keyboard([["/start"]])
+          .resize()
+          .oneTime(),
+      });
+    } else {
+      await this.carsModel.create({
+        user_id: userId,
+        last_state: "car_number",
+      });
+
+      await ctx.reply(`Mashina raqamini kiriting`, {
+        parse_mode: "HTML",
+        ...Markup.removeKeyboard(),
+      });
+    }
+  }
+
   async onText(ctx: Context) {
     if ("text" in ctx.message) {
       const userId = ctx.from.id;
@@ -169,6 +203,10 @@ export class BotService {
         });
       } else {
         const address = await this.addressModel.findOne({
+          where: { user_id: userId },
+          order: [["id", "DESC"]],
+        });
+        const car = await this.carsModel.findOne({
           where: { user_id: userId },
           order: [["id", "DESC"]],
         });
@@ -192,6 +230,43 @@ export class BotService {
               ])
                 .resize()
                 .oneTime(),
+            });
+          }
+        } 
+        if (car) {
+          if (car.last_state == "car_number") {
+            car.car_number = +ctx.message.text;
+            car.last_state = "model";
+            await car.save();
+            await ctx.reply(`Modelni kiriting`, {
+              parse_mode: "HTML",
+              ...Markup.removeKeyboard(),
+            });
+          } else if (car.last_state == "model") {
+            car.model = ctx.message.text;
+            car.last_state = "color";
+            await car.save();
+            await ctx.reply(`Mashina rangini kiriting`, {
+              parse_mode: "HTML",
+              ...Markup.removeKeyboard(),
+            });
+          } else if (car.last_state == "color") {
+            car.color = ctx.message.text;
+            car.last_state = "year";
+            await car.save();
+            await ctx.reply(`Mashina yilini kiriting`, {
+              parse_mode: "HTML",
+              ...Markup.removeKeyboard(),
+            });
+          } else if (car.last_state == "year") {
+            car.year = +ctx.message.text;
+            car.last_state = "finish";
+            await car.save();
+            await ctx.reply(`Mashina ma'lumotlari muvaffaqiyatli saqlandi`, {
+              parse_mode: "HTML",
+              ...Markup.keyboard([
+                ["Mening mashinalarim", "Yangi mashina qo'shish"],
+              ]).resize(),
             });
           }
         }
@@ -267,6 +342,29 @@ export class BotService {
     }
   }
 
+  async showCars(ctx: Context) {
+    const userId = ctx.from.id;
+    const user = await this.botModel.findByPk(userId);
+    if (!user) {
+      await ctx.reply(`Siz avval ro'yxatdan o'tmagansiz`, {
+        parse_mode: "HTML",
+        ...Markup.keyboard([["/start"]])
+          .resize()
+          .oneTime(),
+      });
+    } else {
+      const cars = await this.carsModel.findAll({
+        where: { user_id: userId },
+      });
+
+      cars.forEach(async (car) => {
+        await ctx.replyWithHTML(
+          `<b>Mashina raqami: </b>${car.car_number}\n<b>Model: </b>${car.model}\n<b>Mashina rangi: </b>${car.color}\n<b>Mashina yili: </b>${car.year}`
+        );
+      });
+    }
+  }
+
   async onClickLocation(ctx: Context) {
     try {
       const actText: String = ctx.callbackQuery["data"];
@@ -277,7 +375,7 @@ export class BotService {
         +address.location.split(",")[1]
       );
     } catch (error) {
-      console.log("onClickLocation", error)
+      console.log("onClickLocation", error);
     }
   }
 }
