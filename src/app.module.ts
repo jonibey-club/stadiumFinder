@@ -26,6 +26,8 @@ import { Admin } from "./admin/models/admin.model";
 import { Bot } from "./bot/models/bot.model";
 import { Address } from "./bot/models/address.model";
 import { Cars } from "./bot/models/cars.model";
+import { OtpModule } from './otp/otp.module';
+import { Otp } from "./otp/models/otp.model";
 
 @Module({
   imports: [
@@ -59,7 +61,8 @@ import { Cars } from "./bot/models/cars.model";
         Admin,
         Bot,
         Address,
-        Cars
+        Cars,
+        Otp
       ],
       autoLoadModels: true,
       sync: { alter: true },
@@ -75,6 +78,7 @@ import { Cars } from "./bot/models/cars.model";
     UserWalletModule,
     BotModule,
     AdminModule,
+    OtpModule,
   ],
   controllers: [],
   providers: [],

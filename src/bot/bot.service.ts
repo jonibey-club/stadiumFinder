@@ -119,6 +119,7 @@ export class BotService {
         { status: false, phone_number: null },
         { where: { user_id: userId } }
       );
+      await this.bot.telegram.sendChatAction(user.user_id, "typing");
       await ctx.reply(`Siz Botdan chiqdingiz`, {
         parse_mode: "HTML",
         ...Markup.removeKeyboard(),
@@ -206,10 +207,6 @@ export class BotService {
           where: { user_id: userId },
           order: [["id", "DESC"]],
         });
-        const car = await this.carsModel.findOne({
-          where: { user_id: userId },
-          order: [["id", "DESC"]],
-        });
         if (address) {
           if (address.last_state == "address_name") {
             address.address_name = ctx.message.text;
@@ -232,7 +229,11 @@ export class BotService {
                 .oneTime(),
             });
           }
-        } 
+        }
+        const car = await this.carsModel.findOne({
+          where: { user_id: userId },
+          order: [["id", "DESC"]],
+        });
         if (car) {
           if (car.last_state == "car_number") {
             car.car_number = +ctx.message.text;
@@ -377,5 +378,21 @@ export class BotService {
     } catch (error) {
       console.log("onClickLocation", error);
     }
+  }
+
+  async sendOtp(phone_number: string, OTP: string): Promise<boolean> {
+    const user = await this.botModel.findOne({ where: { phone_number } });
+    if (!user || !user.status) {
+      return false;
+    }
+
+    await this.bot.telegram.sendChatAction(user.user_id,"typing")
+
+    await this.bot.telegram.sendMessage(
+      user.user_id,
+      "Verify OTP code: " + OTP
+    );
+
+    return true;
   }
 }

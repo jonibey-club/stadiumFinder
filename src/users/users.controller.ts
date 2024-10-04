@@ -16,18 +16,28 @@ import { UsersService } from "./users.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserGuard } from "../guards/user.guard";
+import { PhoneUserDto } from "./dto/phone-user.dto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto copy";
 
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
- 
+  @Post("newotp")
+  newOtp(@Body() phoneUserDto: PhoneUserDto) {
+    return this.usersService.newOtp(phoneUserDto);
+  }
+
+  @Post("verifyotp")
+  verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.usersService.verifyOtp(verifyOtpDto);
+  }
+
   @Get("activate/:link")
   async activateUser(@Param("link") link: string) {
     return this.usersService.activateUser(link);
   }
-
 
   @UseGuards(UserGuard)
   @Get("get")
