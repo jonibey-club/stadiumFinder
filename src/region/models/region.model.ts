@@ -1,5 +1,6 @@
 import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import { District } from "../../district/models/district.model";
+import { Stadium } from "../../stadium/models/stadium.model";
 
 interface IRegionCreationAttr {
   name: string;
@@ -15,4 +16,7 @@ export class Region extends Model<Region, IRegionCreationAttr> {
 
   @HasMany(() => District)
   districts: District[];
+
+  @HasMany(() => Stadium)
+  stadiums: Stadium[];
 }

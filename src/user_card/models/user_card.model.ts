@@ -1,5 +1,14 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  Table,
+} from "sequelize-typescript";
 import { User } from "../../users/models/user.model";
+import { Cart } from "../../cart/models/cart.model";
 
 interface IUserCardCreationAttr {
   userId: number;
@@ -17,7 +26,7 @@ export class UserCard extends Model<UserCard, IUserCardCreationAttr> {
   @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
   id: number;
 
-  @ForeignKey(()=> User)
+  @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER })
   userId: number;
 
@@ -42,6 +51,6 @@ export class UserCard extends Model<UserCard, IUserCardCreationAttr> {
   @Column({ type: DataType.BOOLEAN })
   is_main: boolean;
 
-  @BelongsTo(()=>User)
+  @BelongsTo(() => User)
   user: User;
 }

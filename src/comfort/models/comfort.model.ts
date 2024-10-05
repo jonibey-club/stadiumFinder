@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import { ComfortStadium } from "../../comfort-stadium/models/comfort-stadium.model";
 
 interface IComfortCreationAttr {
   name: string;
@@ -11,4 +12,7 @@ export class Comfort extends Model<Comfort, IComfortCreationAttr> {
 
   @Column({ type: DataType.STRING, allowNull: false })
   name: string;
+
+  @HasMany(() => ComfortStadium)
+  comfortStadiums: ComfortStadium[];
 }

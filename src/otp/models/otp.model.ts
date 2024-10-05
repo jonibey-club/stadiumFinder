@@ -1,15 +1,15 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
-interface IOtpCreationAttr{
-  id:string;
-  otp:string;
-  expiration_time:Date;
-  verified:boolean;
-  phone_number:string;
+interface IOtpCreationAttr {
+  id: string;
+  otp: string;
+  expiration_time: Date;
+  verified: boolean;
+  phone_number: string;
 }
 
-@Table({tableName: "otp"})
-export class Otp extends Model<Otp,IOtpCreationAttr>{
+@Table({ tableName: "otp" })
+export class Otp extends Model<Otp, IOtpCreationAttr> {
   @Column({
     type: DataType.UUID,
     primaryKey: true,

@@ -3,10 +3,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import { Region } from "../../region/models/region.model";
+import { Stadium } from "../../stadium/models/stadium.model";
 
 interface IDistrictCreationAttr {
   name: string;
@@ -27,4 +29,7 @@ export class District extends Model<District, IDistrictCreationAttr> {
 
   @BelongsTo(() => Region)
   region: Region;
+
+  @HasMany(() => Stadium)
+  stadiums: Stadium[];
 }

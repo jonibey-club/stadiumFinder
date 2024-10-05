@@ -26,8 +26,22 @@ import { Admin } from "./admin/models/admin.model";
 import { Bot } from "./bot/models/bot.model";
 import { Address } from "./bot/models/address.model";
 import { Cars } from "./bot/models/cars.model";
-import { OtpModule } from './otp/otp.module';
+import { OtpModule } from "./otp/otp.module";
 import { Otp } from "./otp/models/otp.model";
+import { ComfortStadiumModule } from "./comfort-stadium/comfort-stadium.module";
+import { ComfortStadium } from "./comfort-stadium/models/comfort-stadium.model";
+import { StadiumModule } from "./stadium/stadium.module";
+import { Stadium } from "./stadium/models/stadium.model";
+import { CommentsModule } from "./comments/comments.module";
+import { Comments } from "./comments/models/comments.model";
+import { MediaModule } from "./media/media.module";
+import { Media } from "./media/models/media.model";
+import { StadiumTimesModule } from "./stadium-times/stadium-times.module";
+import { StadiumTime } from "./stadium-times/models/stadium-time.model";
+import { CartModule } from "./cart/cart.module";
+import { Cart } from "./cart/models/cart.model";
+import { OrdersModule } from "./orders/orders.module";
+import { Order } from "./orders/models/order.model";
 
 @Module({
   imports: [
@@ -62,11 +76,18 @@ import { Otp } from "./otp/models/otp.model";
         Bot,
         Address,
         Cars,
-        Otp
+        Otp,
+        ComfortStadium,
+        Stadium,
+        Comments,
+        Media,
+        StadiumTime,
+        Cart,
+        Order,
       ],
       autoLoadModels: true,
       sync: { alter: true },
-      logging: false
+      logging: false,
     }),
     ComfortModule,
     CategoriesModule,
@@ -79,6 +100,13 @@ import { Otp } from "./otp/models/otp.model";
     BotModule,
     AdminModule,
     OtpModule,
+    ComfortStadiumModule,
+    StadiumModule,
+    CommentsModule,
+    MediaModule,
+    StadiumTimesModule,
+    CartModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
