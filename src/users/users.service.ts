@@ -44,12 +44,13 @@ export class UsersService {
       throw new BadRequestException("Avval botdan ro'yxatdan o'ting!");
     }
     //sms
-    const response = await this.smsService.sendSms(phone_number,otp)
-    if(response.status !== 200){
-      throw new ServiceUnavailableException("OTP yuborishda xatolik")
+    const response = await this.smsService.sendSms(phone_number, otp);
+    if (response.status !== 200) {
+      throw new ServiceUnavailableException("OTP yuborishda xatolik");
     }
-    const message = `OTP code has been send to ****` + phone_number.slice(phone_number.length-4)
-
+    const message =
+      `OTP code has been send to ****` +
+      phone_number.slice(phone_number.length - 4);
 
     const now = new Date();
 
@@ -72,6 +73,15 @@ export class UsersService {
     const encodedData = await encode(JSON.stringify(details));
 
     return { message, details: encodedData };
+  }
+
+  async refreshSmsToken() {
+    const response = await this.smsService.refreshToken();
+    if (response.status) {
+      throw new ServiceUnavailableException("Token yangilashda xatolik");
+    }
+    const message = `SMS token has been refreshed`;
+    return { message, token: response };
   }
 
   async verifyOtp(verifyOtpDto: VerifyOtpDto) {
@@ -114,15 +124,15 @@ export class UsersService {
         verified: true,
       },
       {
-        where: {id: details.otp_id},
-        returning: true
+        where: { id: details.otp_id },
+        returning: true,
       }
     );
 
     const response = {
       message: "Siz owner bo'ldingiz",
-      owner: user[1][0].is_owner
-    }
+      owner: user[1][0].is_owner,
+    };
 
     return response;
   }

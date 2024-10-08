@@ -45,6 +45,11 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Post("refreshSmsToken")
+  refreshSmsToken() {
+    return this.usersService.refreshSmsToken();
+  }
+
   @Get("get/:id")
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id);

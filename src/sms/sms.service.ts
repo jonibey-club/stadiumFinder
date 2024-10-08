@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 const FormData = require('form-data');
 import  axios from 'axios';
+import { SMS_TOKEN } from '../app.constants';
 
 @Injectable()
 export class SmsService {
@@ -35,6 +36,29 @@ export class SmsService {
       return { status: 500 };
     }
   }
-  async refreshToken() {}
+  async refreshToken() {
+
+    var config = {
+      method: "patch",
+      maxBodyLength: Infinity,
+      url: "https://notify.eskiz.uz/api/auth/refresh",
+      headers: {
+        Authorization: `Bearer ${SMS_TOKEN}`,
+      },
+    };
+
+    try {
+     const response = await axios(config);
+     return response.data;
+    } catch (error) {
+      console.log(error)
+      return { status: 500 };
+    }
+
+    
+
+  }
+
+  
   async getToken() {}
 }
