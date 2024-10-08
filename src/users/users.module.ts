@@ -10,6 +10,7 @@ import { MailService } from "../mail/mail.service";
 import { BotModule } from "../bot/bot.module";
 import { Bot } from "../bot/models/bot.model";
 import { Otp } from "../otp/models/otp.model";
+import { SmsModule } from "../sms/sms.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Otp } from "../otp/models/otp.model";
     JwtModule.register({}),
     MailModule,
     BotModule,
+    SmsModule,
     Otp,
     // forwardRef(()=>AuthModule)
   ],

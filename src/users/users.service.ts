@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -18,6 +19,7 @@ import { AddMinutesToDate } from "../helpers/addMinutes";
 import * as uuid from "uuid";
 import { decode, encode } from "../helpers/crypto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto copy";
+import { SmsService } from "../sms/sms.service";
 
 @Injectable()
 export class UsersService {
@@ -25,7 +27,8 @@ export class UsersService {
     @InjectModel(User) private userModel: typeof User,
     @InjectModel(Otp) private otpModel: typeof Otp,
     private readonly jwtService: JwtService,
-    private readonly botService: BotService
+    private readonly botService: BotService,
+    private readonly smsService: SmsService
   ) {}
 
   async newOtp(phoneUserDto: PhoneUserDto) {
@@ -35,10 +38,18 @@ export class UsersService {
       lowerCaseAlphabets: false,
       specialChars: false,
     });
+    //bot
     const isSend = await this.botService.sendOtp(phone_number, otp);
     if (!isSend) {
       throw new BadRequestException("Avval botdan ro'yxatdan o'ting!");
     }
+    //sms
+    const response = await this.smsService.sendSms(phone_number,otp)
+    if(response.status !== 200){
+      throw new ServiceUnavailableException("OTP yuborishda xatolik")
+    }
+    const message = `OTP code has been send to ****` + phone_number.slice(phone_number.length-4)
+
 
     const now = new Date();
 
@@ -60,7 +71,7 @@ export class UsersService {
 
     const encodedData = await encode(JSON.stringify(details));
 
-    return { message: "OTP telegramga yuborildi", details: encodedData };
+    return { message, details: encodedData };
   }
 
   async verifyOtp(verifyOtpDto: VerifyOtpDto) {

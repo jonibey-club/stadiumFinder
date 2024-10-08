@@ -1,5 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
-import { Address } from "./address.model";
+// import { Address } from "./address.model";
 
 interface IBotCreationAttr {
   user_id: number;

@@ -42,6 +42,7 @@ import { CartModule } from "./cart/cart.module";
 import { Cart } from "./cart/models/cart.model";
 import { OrdersModule } from "./orders/orders.module";
 import { Order } from "./orders/models/order.model";
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { Order } from "./orders/models/order.model";
     StadiumTimesModule,
     CartModule,
     OrdersModule,
+    SmsModule,
   ],
   controllers: [],
   providers: [],
