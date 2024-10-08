@@ -20,6 +20,7 @@ import * as uuid from "uuid";
 import { decode, encode } from "../helpers/crypto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto copy";
 import { SmsService } from "../sms/sms.service";
+import { NewTokenDto } from "./dto/newToken.dto";
 
 @Injectable()
 export class UsersService {
@@ -73,6 +74,17 @@ export class UsersService {
     const encodedData = await encode(JSON.stringify(details));
 
     return { message, details: encodedData };
+  }
+
+  async getNewToken(newTokenDto: NewTokenDto){
+    // console.log("sms ga kiryapti")
+    const response = await this.smsService.getToken(newTokenDto.email,newTokenDto.password);
+    // console.log("sms oxwadi")
+    if (response.status) {
+      throw new ServiceUnavailableException("Token olishda xatolik");
+    }
+    const message = `SMS token has got`;
+    return { message, token: response };
   }
 
   async refreshSmsToken() {

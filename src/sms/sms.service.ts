@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
 const FormData = require('form-data');
 import  axios from 'axios';
-import { SMS_TOKEN } from '../app.constants';
 
 @Injectable()
 export class SmsService {
@@ -43,7 +42,7 @@ export class SmsService {
       maxBodyLength: Infinity,
       url: "https://notify.eskiz.uz/api/auth/refresh",
       headers: {
-        Authorization: `Bearer ${SMS_TOKEN}`,
+        Authorization: `Bearer ${process.env.SMS_TOKEN}`,
       },
     };
 
@@ -60,5 +59,35 @@ export class SmsService {
   }
 
   
-  async getToken() {}
+  async getToken(email:string,password: string) {
+    // console.log(email)
+    var data = new FormData();
+    data.append("email", email);
+    // console.log("sms 1");
+    data.append("password", password);
+
+
+    var config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://notify.eskiz.uz/api/auth/login",
+      headers: {
+        ...data.getHeaders(),
+      },
+      data: data,
+    };
+    // console.log("sms 2");
+
+
+    try {
+      const response = await axios(config)
+      return response.data;
+      
+    } catch (error) {
+      console.log("sms 3");
+      console.log(error)
+      return { status: 500 };
+    }
+
+  }
 }

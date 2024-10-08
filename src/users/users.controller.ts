@@ -18,6 +18,7 @@ import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { UserGuard } from "../guards/user.guard";
 import { PhoneUserDto } from "./dto/phone-user.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto copy";
+import { NewTokenDto } from "./dto/newToken.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -48,6 +49,11 @@ export class UsersController {
   @Post("refreshSmsToken")
   refreshSmsToken() {
     return this.usersService.refreshSmsToken();
+  }
+
+  @Post("getNewToken")
+  getNewToken(@Body() newTokenDto:NewTokenDto) {
+    return this.usersService.getNewToken(newTokenDto);
   }
 
   @Get("get/:id")
